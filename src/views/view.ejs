@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>DAV <%- location %></title>
+  <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
+  <link href="https://vjs.zencdn.net/7.15.4/video-js.css" rel="stylesheet" />
+
+  <script src="/static/uploader.js"></script>
+  <script src="/static/message.js"></script>
+
+  <!-- Table sort -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  
+  <!-- Syntax highlight -->
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.0.1/styles/default.min.css"> -->
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/agate.min.css">
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/monokai.min.css"> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.0.1/highlight.min.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.7.0/highlightjs-line-numbers.min.js"></script> -->
+  <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script> -->
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/languages/r.min.js"></script> -->
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.3.0/highlightjs-line-numbers.min.js"></script> -->
+
+  
+  <link rel="stylesheet" href="/static/style.css">
+  <meta name="viewport" content="width=device-width,initial-scale=0.8,minimum-scale=0.8, maximum-scale=1.0" />
+<style>
+</style>
+</head>
+<!-- <body oncontextmenu="return false;" onclick="body_clicked()"> -->
+<body  onclick="body_clicked()">
+  <header class="header-start">
+      <img class="logo-img" src="/static/logo.png">
+      <a class="server-title" href="/">WebDAV</a>
+      <span class="server-description">Description</span>
+      <div id="progress-bar" style="display:none"><div id="progress-bar-inside"></div></div>
+  </header>
+
+  <!-- <nav class="header_nav"> -->
+    <label for="show-header-menu" class="show-header-menu-label"><i class="fa fa-bars"></i></label>
+    <input type="checkbox" id="show-header-menu" role="button">
+    <div class="hmenu-bg" onclick="document.getElementById('show-header-menu').checked = false;"></div>
+    <ul class="h_nav_wrapper">
+      <li><a href="/">Home</a></li>
+      <% if(login || !need_login_to_edit){ %>
+      <li><a href="/trash">Trash</a></li>
+      <% } %>
+
+      <% if(login && (need_login || need_login_to_edit)){ %>
+      <li><a class="btn logout-btn" href="logout">Logout</a></li>
+    <% } else { %>
+      <li><a class="btn login-btn" href="login">Login</a></li>
+    <% } %>
+      <li><span onclick="download('<%- location %>', <% type === 'dir' %>)"><i class="fas fa-download"></i>Download </span></li>
+      <% if(login || !need_login_to_edit){ %>
+      <li><span onclick="remove_all_trash()">ゴミ箱を空にする</span></li>
+      <% } %>
+    </ul>
+  <!-- </nav> -->
+
+  <main id="main" ondragover="allowDrop(event)" >
+    <div class="title-wrapper">
+      <span class="header-title table-cell"><%- location_html %></span>
+      <div class="progress-bar-header table-cell" style="display:none;"></div>
+      <span onclick="goto('<%- parent_dir %>')" class="fa-menu-btn cursor-pointer table-cell"><i class="fas fa-level-up-alt"></i></span>
+      <% if(login || !need_login_to_edit){ %>
+      <span onclick="mkdir_open_form()" class="fa-menu-btn cursor-pointer table-cell"><i class="fas fa-folder-plus"></i></span>
+      <input type="file" id="upload-file-input" multiple style="display:none">
+      <span onclick="file_upload_btn()" class="fa-menu-btn cursor-pointer table-cell"><i class="fas fa-plus"></i></span>
+      <% } %>
+    </div>
+<% if(type === "dir"){ %>
+    <h1>Directory</h1>
+    <div class="dir-list dir-list-head" id="dir-list-wrapper-div">
+
+    <% if(view_type === "list"){ %>
+      <table class="dir-list" cellspacing="0" cellpadding="0">
+        <thead><tr>
+          <td></td>
+          <td class="sort dir-list-fname" data-sort="dir-list-name">Name</td>
+          <% if(login || !need_login_to_edit){ %>
+            <td class="dir-list-htd">Menu</td>
+            <td class="dir-list-htd">remove</td>
+          <% } %>
+
+          <td class="sort dir-list-size dir-list-htd" data-sort="dir-list-size">Size</td>
+          <td class="sort dir-list-ctime dir-list-htd" data-sort="dir-list-ctime">Created</td>
+          <td class="sort dir-list-mtime dir-list-htd" data-sort="dir-list-mtime">Modified</td>
+          <td class="dir-list-download dir-list-htd" data-sort="td_userid"></td>
+        </tr></thead>
+        <tbody class="list">
+        <% result.forEach((r) => { %>
+          <tr class="dir-list" oncontextmenu="show_rclick_menu('<%- r.location %>')">
+              <td class="dir-list-icon"><i class="<%- r.icon %>"></i></td>
+              <td class="dir-list-name cursor-pointer" onclick="goto(decodeURIComponent('<%- r.location %>'))"><%- r.name %></td>
+              <% if(login || !need_login_to_edit){ %>
+                <td class="dir-list-menu" onclick="show_rclick_menu('<%- r.location %>')"><i class="fas fa-ellipsis-h"></i></td>
+                <td class="dir-list-remove cursor-pointer" onclick="remove('<%- r.location %>')"><i class="fas fa-trash"></i></td>
+              <% } %>
+              <td class="dir-list-size"> <%- r.size %> </td>
+              <td class="dir-list-ctime"><%- r.ctime %></td>
+              <td class="dir-list-mtime"><%- r.mtime %></td>
+              <td class="dir-list-download"><i class="fas fa-download" onclick='download("<%- r.location %>", <%- r.type === "dir" %>)'></i></td>
+          </tr>
+        <% }) %>
+      </tbody></table>
+
+    <% }else{ %> 
+        <!-- Tile型 -->
+        <% result.forEach((r) => { %>
+        <div class="dir-tile" onclick="goto(decodeURIComponent('<%- r.path %>'))">
+            <% if(r.filetype === "image"){ %>
+              <img src="<%- src_dir %><%- r.location %>" alt="<%- location %>" class="dir-tile-thumb">
+            <% }else{ %>
+                <i class="<%- r.icon %> dir-tile-thumb"></i>
+            <% } %>
+            <spane class="dir-tile-fname"><%- r.name %></spane>
+            <% if(login || !need_login_to_edit){ %>
+              <i class="fas fa-menu dir-tile-menu"></i>
+            <% } %>
+            <span class="dir-tile-size"><%- r.size %></i>
+            <span class="dir-tile-ctime"><%- r.ctime %></i>
+            <span class="dir-tile-mtime"><%- r.mtime %></i>
+        </div>
+        <% }) %>
+    <% } %>
+    </div>
+    <script>
+      var userList = new List('dir-list-wrapper-div', {
+        valueNames: ['dir-list-name', 'dir-list-size', 'dir-list-ctime', 'dir-list-mtime' ]
+      });
+      userList.sort( 'dir-list-name', {order : 'asc' });
+    </script>
+
+<% }else if(type === "file"){ %>
+    <table class="file-info">
+      <tr><td>Name</td><td>size</td><td>Created</td><td>Modified</td>
+          <td>Link</td><td>Download</td></tr>
+      <tr><td><a href="<%- src_dir %><%- location %>"><%- name %></a></td><td><%- size %></td><td><%- ctime %></td><td><%- mtime %></td>
+          <td class="cursor-pointer"><i class="fas fa-link" onclick='setClipboard(document.location.protocol + "\/\/" +document.location.host + "/src<%- location %>", true)'></i></td>
+          <td class="cursor-pointer"><i class="fas fa-download" onclick='download("<%- location %>")'></i></td></tr>
+    </table>
+    <div class="file-viewer">
+      <% if(filetype === "image"){ %>
+        <img src="<%- src_dir %><%- location %>" alt="<%- location %>" style="max-width:90%;">
+      <% }else if(filetype === "text" || filetype === "code"){ %> 
+        <pre class="text-viewer"><code><%= context %></code></pre>
+      <% }else if(filetype === "pdf"){ %>
+        <p>PDFファイル</p>
+        <p><a class="form-submit-btn" href="<%- src_dir %><%- location %>">新しいWindowで表示</a></p> 
+        <embed src="<%- src_dir %><%- location %>" type="application/pdf" width="100%" height="100%">
+      <% }else if(filetype === "audio"){ %>
+          <audio src="<%- src_dir %><%- location %>"></audio>
+      <% }else if(filetype === "movie"){ %>
+        <video class="video-js" style="max-width:600px;" data-setup={} controls playsinline>
+        <source src="<%- src_dir %><%- location %>" type="<%- minetype %>"> </video> `;
+      <% } else{ %>
+          プレビュー表示できません
+          <p><a class="form-submit-btn" href="<%- src_dir %><%- location %>">ダウンロード</a></p>  
+      <% } %>
+    </div>
+<% }else if(type === "unknown"){ %>
+<% }else if(type === "notfound"){ %>
+    <h1>Opps, file not found!!</h1>
+<% }%>
+  </main>
+</body>
+
+<!-- #################################################################################################
+                                        Forms
+################################################################################################# -->
+
+<div class="popup" id="mkdir-form" style="visibility:hidden;">
+  <div class="popup-inner my-form">
+    <button class="popup-close-btn" onclick="document.getElementById('mkdir-form').style.visibility = 'hidden'">
+    <i class="fas fa-times"></i></button>
+    <p class="my-form-title">新しいフォルダ</p>
+
+    <label for="new-folder-name">フォルダ名</label><br>
+    <input type="text" id="new-folder-name" ><br><br>
+
+    <input type="checkbox" id="new-folder-hidden">
+    <label for="new-folder-hidden">Enabled</label>
+    
+    <button class="form-submit-btn-small" onclick="mkdir_submit_form()">更新</button>
+  </div>
+</div>
+
+
+<div class="popup" id="copy-file-form" style="visibility:hidden;">
+  <script>
+    const close_copy_file_form = ()=>{
+      document.getElementById('copy-file-form').style.visibility = 'hidden';
+      document.getElementById('click-detector').style.display = 'none';
+      document.getElementById('file-list-rclick-menu').style.display = 'none';
+    }
+  </script>
+  <div class="popup-inner my-form">
+    <button class="popup-close-btn" onclick="close_copy_file_form()">
+      <i class="fas fa-times"></i></button>
+    <h1><span id="copy-file-form-loc"></span>〜をコピーします。</h1>
+    <label></label>
+    <label for="copy-file-form-to">コピー先</label><br>
+    <input type="text" id="copy-file-form-to" list="dirs" class="input-text-with-btn" placeholder="/hogehoge"><br>
+    <datalist id="copy-file-form-dl">
+      <option value="/">/</option>
+    </datalist>
+    <button class="form-submit-btn-oneline" id="copy-file-form-btn">コピー</button>
+  </div>
+</div>
+
+<div id="click-detector"></div>
+<div id="file-list-rclick-menu">
+  <ul>
+    <li id="file-list-rclick-menu-copy"    ><i class="fas fa-copy"></i>Copy</li>
+    <li id="file-list-rclick-menu-move"    ><i class="fas fa-angle-double-right"></i>Move</li>
+    <li id="file-list-rclick-menu-delete"  ><i class="fas fa-trash"></i>Delete</li>
+    <li id="file-list-rclick-menu-download"><i class="fas fa-download"></i>Download</li>
+    <li id="file-list-rclick-menu-copylink"><i class="fas fa-link"></i>Copy Link</li>
+    <hr>
+    <li onclick="__close()"><i class="fas fa-times"></i>Close</li>
+  </ul>
+</div>
+<script>
+  const __close = () => {
+    const menu = document.getElementById('file-list-rclick-menu');
+    const click_detect = document.getElementById("click-detector");
+    menu.style.display="none";
+    click_detect.style.display="none";
+  }
+</script>
+
+<script>
+  // mouse move
+  let mousePos = []
+  window.onmousemove = event => {
+      event = event || window.event; // IE対応
+      mousePos = [event.clientX, event.clientY];
+  }
+
+  const mkdir_open_form = ()=> {document.getElementById("mkdir-form").style.visibility = "unset";}
+
+  const mkdir_submit_form = async() => {
+    const dir_name = document.getElementById("new-folder-name").value;
+    const basedir = (new URL(document.location.href)).searchParams.get("dir") || "";
+    const location = `${basedir}/${dir_name}`
+    console.log(location)
+
+    const result = await fetch("/api/mkdir", {
+      method:"POST",
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({location})
+    })
+    document.getElementById("mkdir-form").style.visibility = "hidden";
+    if(!result.ok){
+      console.log("ERROR", result.text);
+    }
+    document.location.reload()
+  }
+
+  const file_upload_btn = () => {
+    let el = document.getElementById("upload-file-input");
+    el.addEventListener("change", async(e)=> {
+      const files = el.files;
+      const basedir = (new URL(document.location.href)).searchParams.get("dir") || "/"
+      console.log(files)
+      await upload(files, basedir);
+    })
+    el.click();
+  }
+
+  const show_progress_bar = (show, percent=0, _msg="") => {
+    const el = document.getElementById("progress-bar")
+    const el2 = document.getElementById("progress-bar-inside");
+
+    if(!show){ el.style.display = "none"; return;}
+    const msg = (_msg === "") ? `${percent}/100%` : _msg;
+    el2.innerText = msg;
+    el.style.display = "block";
+    console.log(`${percent}%`)
+    el2.style.width = `${percent}%`;
+  }
+
+  const show_rclick_menu = (location) => {
+    console.log("AAAAAAAAAAAAAAAAAAAa")
+
+    document.getElementById("file-list-rclick-menu-copy").onclick = () => {
+      const form = document.getElementById("copy-file-form");
+      document.getElementById("copy-file-form-loc").innerText = location;
+      const btn = document.getElementById("copy-file-form-btn")
+      const datalist = document.getElementById("copy-file-form-dl")
+      const input = document.getElementById("copy-file-form-to")
+      
+      input.oninput = async(e) => {
+        const res = await fetch("/api/list", {
+          method:"POST",
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({location : input.value.replace(/(.+)\/(.^\/)+^/gm, "$1")})
+        })
+        if(res.status === 500){return false;}
+        const data = (await res.json()).child;
+        let dl_text = "<option class='copy-file-form-op' value='/'>/</option>"
+        for(d in data){
+          dl_text += `<option class='copy-file-form-op' value='${data[d].location}'>${data[d].location}</option>`
+        }
+        datalist.innerHTML = dl_text;
+        const options = Array.from(document.getElementsByClassName("copy-file-form-op"));
+        options.forEach(el => {el.onclick = () => {input.value = el.value;}});
+        console.log(input.value, dl_text)
+      }
+
+      btn.onclick = async(e) => {
+        const res = await fetch("/api/copy", {
+          method:"POST",
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({from : location, to:input.value})
+        })
+        // document.location.reload()
+      }
+      form.style.visibility = "visible";
+    };
+
+    document.getElementById("file-list-rclick-menu-move").addEventListener("click", () => {
+
+    });
+
+    document.getElementById("file-list-rclick-menu-delete").addEventListener("click", () => {remove(location)});
+    document.getElementById("file-list-rclick-menu-download").addEventListener("click", () => {download(location)});
+
+    const link = `${document.location.protocol}//${document.location.host}/src${location}`;
+    document.getElementById("file-list-rclick-menu-copylink").addEventListener("click", () => {setClipboard(link, true)});
+
+    const menu = document.getElementById('file-list-rclick-menu');
+    menu.style.left=`${mousePos[0]}px`;
+    menu.style.top=`${mousePos[1]}px`;
+    menu.style.display="block";
+    const click_detect = document.getElementById("click-detector");
+
+    click_detect.style.display="inline";
+    click_detect.onclick = (e) => {
+      menu.style.display = "none"; 
+      click_detect.style.display = "none";
+    }
+    return false;
+  }
+
+  const body_clicked = (e) => {
+    // document.getElementById('file-list-rclick-menu').style.display="none";
+  }
+
+
+  const allowDrop = (ev) => {
+    ev.preventDefault();
+  }
+
+  const goto = (dir)=> {
+    var params = new URLSearchParams(location.search);
+    params.set('dir', dir);
+    window.location.search = params.toString();
+  }
+
+  const setClipboard = (str, showMsg = false) => {
+    const el = document.createElement('textarea');
+    el.value = str;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+
+    if(showMsg){MyMessage({msg:"クリップボードにリンクをコピーしました。", duration:3000})}
+  }
+
+  const download = async(location, zip=false) => {
+    const result = await fetch("/api/download", {
+      method:"POST",
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({location})
+    })
+
+    if(!result.ok){
+      console.log("ERROR", result.text);
+      return false;
+    }
+    const blob_data = await result.blob()
+    let blob = new Blob(
+      [blob_data],
+      // { "type": result_json.mimetype || "text/plain" }
+    )
+    let link = document.createElement('a')
+    link.href = window.URL.createObjectURL(blob)
+    link.download = location.split("/").pop() + (zip ? ".zip" : "");
+    link.click()
+  }
+
+  const remove = async(location) => {
+    const response =  await fetch("/api/remove", {
+      method:"POST",
+      headers: {'Content-Type': 'application/json'},
+      body:JSON.stringify({location:location})
+    })
+    if(response.ok){
+      console.log("OK")
+      document.location.reload()
+    }else{
+      console.error("error", await response.text())
+      MyMessage({msg:"アップロード失敗"})
+    }
+  }
+
+
+  const remove_all_trash = async() => {
+    const response =  await fetch("/api/remove-all-trash", {
+      method:"POST",
+    })
+    if(response.ok){
+      console.log("OK")
+      document.location.reload()
+    }else{
+      console.error("error", await response.text())
+      MyMessage({msg:"アップロード失敗"})
+    }
+  }
+
+  const upload = async(files, _basedir) => {
+    console.log("UPLOAD!!")
+    const basedir = _basedir || "/"
+    console.log(files.length)
+    for(let i=0; i<files.length; i++){
+      // let data = new FormData();
+      console.log(files[i])
+      show_progress_bar(true, 100*i/files.length, `${i}/${files.length} upload:${files[i].name}`);
+
+      const new_name = `${basedir}/${files[i].name}`
+      console.log(new_name);
+      const r =  await fetch("/api/exists", {
+        method:"POST",
+        headers: {'Content-Type': 'application/json'},
+        body:JSON.stringify({location:new_name}),
+        redirect:"manual"
+      }) 
+      if(r.status  === 0 || r.status === 302){
+        MyMessage({msg:"アップロード失敗 - 権限がありません", duration:3000})
+        show_progress_bar(false);
+        return;
+      }
+
+      const d = await r.json();
+      if(d.exist && d.type === "file"){
+        const rewrite_ok = await MyMessage({type:"confirm", title:"update?", msg:`${new_name}はすでに存在します。上書きしますか？`})
+        console.log(rewrite_ok);
+        if(rewrite_ok !== "ok"){
+          return false;
+        }
+      }else if(d.type === "dir"){
+        await MyMessage({type:"confirm", title:"ERROR", msg:`"${new_name}"はディレクトリです。上書きできません`})
+      }
+
+      const uploader = new HugeUploader({ endpoint: 'api/upload/', file: files[i] , postParams:{basedir, name:files[i].name, new_name}});
+
+      // subscribe to events
+      uploader.on('error', (err) => {
+          console.error('Something bad happened', err.detail);
+          MyMessage({msg:"アップロード失敗", duration:3000})
+      });
+
+      uploader.on('progress', (progress) => {
+          console.log(`The upload is at ${progress.detail}%`);
+          show_progress_bar(true, progress.detail, `upload : ${files[i].name}`);
+      });
+
+      uploader.on('finish', (body) => {
+          MyMessage({msg:"アップロード完了", duration:2000})
+          // document.location.reload()
+      });
+    }
+
+    show_progress_bar(false);
+  }
+
+  const handleDragOver = (evt) =>{
+    evt.stopPropagation();
+    evt.preventDefault();
+    evt.dataTransfer.dropEffect = 'copy';
+  }
+
+  window.ondrop = async(e) => {
+      e.preventDefault();
+      console.log("file dropped")
+      const files = e.dataTransfer.files;
+      const basedir = (new URL(document.location.href)).searchParams.get("dir") || "/"
+      console.log(files)
+      await upload(files, basedir);
+      // document.location.reload()
+      return true;
+  }
+
+  window.onload = () => {
+    // syntax highlight
+    hljs.highlightAll();
+    // hljs.initHighlightingOnLoad();
+    // hljs.initLineNumbersOnLoad();
+
+    const main_content = document.getElementById("main");
+    main_content.addEventListener("dragover",(event) => {
+      event.preventDefault();
+    });
+  }
+</script>
+
+
+</html>

@@ -1,0 +1,35 @@
+version: '3'                                                                                                                                                                                                                                
+services:
+  fileserver:
+    image: 'node:16-alpine'
+    container_name: 'fileserver' 
+    working_dir: /src
+    tty: true
+    restart: always
+    command: npm start
+    environment:
+      PORT: "8080"
+      ExpireTime: "500000"
+      DIR: /data
+      TRASH_DIR: /trash
+      BACKUP_DIR: /backup
+      UPLAD_TEMP_DIR: ~/.tmp
+
+      needLogin: "false"
+      needLoginToEdit: "false"
+      user_name: username
+      user_password: password
+
+      BACKUP: "true"
+      BACKUP_TIME: "0 1 * * *"
+
+      UPLOAD_FILE_MAX_SIZE: "10"
+      UPLOAD_MAX_CHUNK_SIZE: "5000"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src:/src
+      - ./data:/data
+      - ./trash:/trash
+      - ./backup:/backup
+

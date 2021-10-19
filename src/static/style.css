@@ -1,0 +1,645 @@
+
+html{font-size:17px;}
+@media (pointer:none), (pointer:coarse) {html{font-size: 13px;}}
+*{ font-size: 1.0rem; color:#000;}
+header{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:50px;
+  background-color: #59E;
+  color:#fff;
+}
+
+.header-start{
+  width:100%;
+  height:50px;
+  justify-items: flex-start;    
+  display: flex;
+  align-items: center;
+}
+
+.header-start .logo-img{
+  width:50px;
+  height:50px;
+  overflow: hidden;
+}
+
+header .server-title{
+  color:#fff;
+  font-size: 1.2rem;
+  text-decoration: none;
+  font-weight:bold;
+}
+
+header .server-description{
+  color:#fff;
+  font-size: 0.8rem;
+  margin: 10px;
+}
+
+.header-title, .header-title a, .header-title a i{
+  text-decoration: none;
+  color:#000;
+  text-decoration: none;
+  font-size: 1.2rem;
+}
+
+#show-header-menu{display:none;}
+
+.h_nav_wrapper ul,
+.h_nav_wrapper li{ 
+  margin: 0; 
+  padding: 0; 
+  line-height: normal; 
+  list-style: none; 
+  width:100%;
+}
+
+.h_nav_wrapper li {
+  list-style-type: none;
+  padding: 5px;
+  margin:3px;
+  text-align: center;
+  left:auto;
+}
+
+.h_nav_wrapper li:hover{
+  background: #abf;
+}
+
+.h_nav_wrapper {
+  margin:0;
+  padding:0;
+  position:fixed;
+  background-color: #7af;
+  width: 0;
+  right:0;
+  top:50px;
+  width:0;
+  height:calc(100vh - 50px);
+  z-index: 3;
+  overflow-y: hidden;
+  transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+}
+
+#show-header-menu:checked ~ .h_nav_wrapper{
+  width: 200px;
+  transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+}
+
+
+.hmenu-bg{
+  position:absolute;
+  width:0px;
+  height:100vh;
+  top:50px;
+  z-index: 1;
+  left:0;
+  right:0;
+  background-color: rgba(0,0,0,0.5);
+  transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+}
+
+.show-header-menu-label{
+  width:50px;
+  height:50px;
+  font-size: 30px;
+  text-align: center;
+  margin:auto;
+  margin-right: 25px;
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+
+.show-header-menu-label i{
+  line-height: 30px;
+  font-size: 30px;
+  text-align: center;
+  color:#fff;
+}
+
+@media (max-width : 800px) {
+  #show-header-menu:checked ~ .hmenu-bg{
+    width:100vw;
+    opacity: 1;
+    transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+  }
+}
+
+.title-wrapper{
+  padding:0 7px;
+  width:100%;
+  display: table;
+}
+
+.title-wrapper .fa-menu-btn{
+  width:30px;
+  height:30px;
+  padding:3px;
+}
+.title-wrapper i{
+  font-size: 25px;
+  color:#48E;
+}
+
+.table-cell{
+  display: table-cell;
+}
+
+#progress-bar{
+  background-color: #668;
+  width: 80%;
+  height:21px;
+  border-radius: 23px;
+  margin-right:60px;
+  margin-left:15px;
+  padding:3px;
+  max-width:400px;
+}
+
+#progress-bar-inside{
+  background-color: rgb(116, 194, 92);
+  color: white;
+  text-align: left;  
+  height:20px;
+  border-radius: 25px;
+  font-size: 0.8rem;
+  overflow-x: hidden;
+}
+
+main{
+  margin-top:65px;
+  width:100%;
+  height:calc(100vh - 65px);
+  transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+}
+
+#show-header-menu:checked ~ main{
+  margin-right: 200px;
+  width:calc(100% - 200px);
+  transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+}
+
+
+.dir-list, .dir-list thead, .dir-list tbody, .dir-list tr{
+  width:100%;
+  align-items: flex-start;
+  border:none;
+}
+
+.dir-list tr{
+  height:30px;
+}
+
+.dir-list thead td{
+  color:#444;
+}
+
+.dir-list i{
+  font-size: 23px;
+  text-align: center;
+  line-height: 23px;
+  color:#48E;
+}
+
+.dir-list-icon{
+  width:30px;
+}
+
+.dir-list-size{
+  width:100px;
+} 
+.dir-list-ctime, .dir-list-mtime{
+  width:130px;
+}
+
+.dir-list tbody tr:hover{
+  background-color:#ddd;
+}
+
+.file-info td{
+  padding: 7px 10px;
+}
+
+.cursor-pointer{
+  cursor: pointer;
+}
+
+.text-viewer,
+code,
+code *{
+  font-size: 0.9rem;
+}
+
+pre, code{
+  white-space: pre-wrap;
+  word-break: break-all ;
+}
+
+.file-viewer{
+  width:calc(100% - 15px);
+  height:calc(100vh - 180px);
+  /* position:fixed; */
+  /* overflow-y: scroll; */
+  /* margin:10px; */
+}
+
+@media screen and (max-width:600px) { 
+  .dir-list-size{display: none;}
+  .dir-list-ctime{display: none;}
+  .dir-list-mtime{display: none;}
+}
+
+.sort.desc:after {
+  content:"▼";
+}
+.sort.asc:after {
+  content:"▲";
+}
+
+
+
+#click-detector{
+  position: fixed;
+  top:0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  opacity: 0;
+  display: none;
+}
+
+#file-list-rclick-menu{
+  display:none;
+  position:fixed;
+  left:0px;
+  top:0px;
+  background-color:#fff;
+  border:solid 1px #888;  
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+  margin:0;
+  z-index: 10;
+}
+
+#file-list-rclick-menu ul{
+  margin:10px 0;
+  padding:3px;
+}
+
+#file-list-rclick-menu li{
+  cursor:pointer;
+  list-style-type:none;
+  padding: 2px 15px 2px 15px;
+}
+#file-list-rclick-menu li i{
+  margin-right: 8px;
+}
+
+#file-list-rclick-menu li,
+#file-list-rclick-menu li i{
+  color:#666;
+}
+
+#file-list-rclick-menu li:hover,
+#file-list-rclick-menu li i:hover{
+  color:#000;
+}
+
+
+/*  ###################################
+   #####        Form Inputs      #######
+###################################*/
+.my-form input[type=text], 
+.my-form select, 
+.my-form textarea {
+  width: 100%;
+  padding: 6px;
+  margin:3px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  font-size: 1.1rem;
+}
+
+.form-submit-btn-oneline{
+  display: table-cell;
+}
+
+.my-form label {
+  padding: 5px;
+  display: inline-block;
+}
+.form-submit-btn{
+  background-color: #04AA6D;
+  color: white;
+  font-size: 1.1rem;
+  padding: 12px 20px;
+  margin:12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.form-submit-btn-small {
+  background-color: #04AA6D;
+  color: white;
+  font-size: 1.2rem;
+  padding: 5px 8px;
+  margin:5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  float: right;
+}
+
+
+.my-form .form-submit-btn:hover, .form-submit-btn-small:hover{
+  background-color: #00f;
+}
+
+
+.my-form input[type="checkbox"].filled-in:checked + span:not(.lever):after {
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e6ee9c;
+  background-color: #afb42b;
+  z-index: 0;
+}
+
+.my-form input[type="checkbox"] {
+  position: relative;
+  width: 1.5rem;
+  height: 1.5rem;
+  color:black;
+  border: 1px solid gray;
+  border-radius: 4px;
+  appearance: none;
+  outline: 0;
+  cursor: pointer;
+  margin-top:15px;
+}
+
+.my-form input[type="checkbox"]::before {
+  position: absolute;
+  content: '';
+  display: block;
+  top: 2px;
+  left: 7px;
+  width: 8px;
+  height: 14px;
+  border-style: solid;
+  border-color: white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+}
+.my-form input[type="checkbox"]:checked {
+  border-color: green;
+  background: green;
+}
+.my-form input[type="checkbox"]:checked::before {
+  opacity: 1;
+}
+
+.search-ui-component {
+  display:flex;
+  flex-direction: row; 
+  justify-content: left;
+  width:100%;
+  padding:9px;
+}
+
+.my-form-oneline input[type=text], 
+.my-form-oneline select, 
+.my-form-oneline textarea {
+width:60%;
+}
+
+#slider-range{
+  margin:8px 30px;
+}
+
+.my-form-title{
+  font-size: 2.0rem;
+  margin-top: 0px;
+  font-weight: bold;
+  border-bottom: solid 1px #000;
+}
+
+
+
+/* ---------------------------  Show datalist  -------------------------*/
+
+datalist {
+  background-color: white;
+  border: 1px solid #888;
+  width: 100%;
+  padding: 10px;
+  max-height: 200px;
+  max-height: 10rem;
+  overflow-y: auto;
+  display: block;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+option {
+  background-color: white;
+  padding: 4px;
+  color: #48E;
+  margin-bottom: 1px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+option:hover,
+.active {
+  background-color: lightblue;
+}
+
+/* ---------------------------  Popup  -------------------------*/
+.popup {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index:30;
+  background-color:rgba(0, 20, 40, 0.5);
+  transition: .6s;
+}
+
+.popup-inner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  width: 80%;
+  height:70%;
+  max-width:700px;
+  max-height:500px;
+  padding: 30px;
+  background-color: #fff;
+  border:solid 2px #000;
+  border-radius: 15px;
+  font-size: 1.2rem;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.popup-inner p{
+  margin-top:0;
+}
+
+.popup-inner img {
+  width: 100%;
+}
+.popup-close-btn {
+  float:right;
+  width: 30px;
+  height: 30px;
+  line-height: 50px;
+  text-align: center;
+  cursor: pointer;
+}
+.popup-close-btn i {
+  font-size: 30px;
+  line-height: 30px;
+  color: #000;
+}
+.black-background {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,.8);
+  z-index: 1;
+  cursor: pointer;
+}
+
+#popup-new-page table, 
+#popup-new-page tr, 
+#popup-new-page tbody{
+  font-size: 1.2rem;
+  width:90%;
+  border:unset;
+}
+
+#popup-new-page td{
+  border:unset;
+}
+
+
+
+/*  ###################################
+  #####        Message Dialog      #######
+  ###################################*/
+.my-dialog-ovelay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.my-dialog-confirm {
+  width: 400px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  border:solid 1px #aaa;
+  overflow: hidden;
+}
+
+.my-dialog-simple{
+  width: 180px;
+  position:fixed;
+  top:100px;
+  right: 10px;
+  height:40px;
+  padding:10px;
+  background-color: #4E9;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  border:solid 1px #aaa;
+  border-radius: 3px;
+  overflow: hidden;
+  z-index:99999;
+}
+
+.my-dialog-title {
+  font-size: 13px;
+  font-weight: bold;
+  padding:8px;
+  margin: 0;
+  color: #888;
+  display: inline-block;
+}
+
+.my-dialog-msg {
+  padding-left: 10px;
+  font-size:0.9rem;
+}
+
+.my-dialog-confirm  .fa-times,
+.my-dialog-simple  .fa-times {
+  float: right;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  padding:10px;
+  border-radius: 1px;
+}
+
+.my-dialog-simple  .fa-times {
+  padding:0;
+}
+
+.my-dialog-buttons {
+  background-color: #ddd;
+  width:100%;
+  height:40px;
+  padding: 0;
+  padding-right:20px;
+}
+
+#my-confirm-yes-btn,
+#my-confirm-no-btn {
+  width: 80px;
+  height:30px;
+  margin:5px 5px;
+  float:right;
+  cursor: pointer;
+}
+
+#my-confirm-yes-btn{
+  background-color: rgb(182, 14, 14);
+  color:#fff;
+}
+
+.my-dialog-fadeout-remove {
+  opacity: 0.0;
+  transition-property: opacity; 
+  transition-duration: 0.3s;
+}
+
+
+   
+
