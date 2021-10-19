@@ -10,10 +10,10 @@ services:
     environment:
       PORT: "8080"
       ExpireTime: "500000"
-      DIR: /data
-      TRASH_DIR: /trash
-      BACKUP_DIR: /backup
-      UPLAD_TEMP_DIR: ~/.tmp
+      DIR: /storage/data
+      TRASH_DIR: /storage/trash
+      BACKUP_DIR: /storage/backup
+      UPLAD_TEMP_DIR: /storage/tmp
 
       needLogin: "false"
       needLoginToEdit: "false"
@@ -28,8 +28,6 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./src:/src
-      - ./data:/data
-      - ./trash:/trash
-      - ./backup:/backup
+      - ./src:/src:ro
+      - ./storage:/storage
 
