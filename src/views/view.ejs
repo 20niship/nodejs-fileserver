@@ -72,11 +72,23 @@
     </div>
 <% if(type === "dir"){ %>
     <h1>Directory</h1>
+
+    <div class="list-selection">
+      <span><span id="selected-files-num-span"></span> files selected</span>
+      <button class="selection-menu-copy" onclick="select_copy()"><i class="fa fa-home"></i> Copy</button>
+      <button class="selection-menu-move" onclick="select_move()"><i class="fa fa-home"></i> Move</button>
+      <button class="selection-menu-remove" onclick="select_remove()"><i class="fa fa-trash"></i> Remove</button>
+      <button class="selection-menu-download" onclick="select_download()"><i class="fa fa-home"></i>Download</button>
+    </div>
+
     <div class="dir-list dir-list-head" id="dir-list-wrapper-div">
 
     <% if(view_type === "list"){ %>
       <table class="dir-list" cellspacing="0" cellpadding="0">
         <thead><tr>
+          <td>
+            <input type="checkbox" id="file-select-chbox-all" name="file-select-chbox-all" onclick="_b_check_all_file_selection(getSelectedFiles().length == get_file_list_num())">
+          </td>
           <td></td>
           <td class="sort dir-list-fname" data-sort="dir-list-name">Name</td>
           <% if(login || !need_login_to_edit){ %>
@@ -90,19 +102,24 @@
           <td class="dir-list-download dir-list-htd" data-sort="td_userid"></td>
         </tr></thead>
         <tbody class="list">
+        <% var i = 0; %>
         <% result.forEach((r) => { %>
           <tr class="dir-list" oncontextmenu="show_rclick_menu('<%- r.location %>')">
+              <td class="dir-list-checkbx">
+                <input type="checkbox" id="file-select-chbox<%- i %>" name="<%- r.location %>" onclick="update_file_selection_menu() ">
+              </td>
               <td class="dir-list-icon"><i class="<%- r.icon %>"></i></td>
               <td class="dir-list-name cursor-pointer" onclick="goto(decodeURIComponent('<%- r.location %>'))"><%- r.name %></td>
               <% if(login || !need_login_to_edit){ %>
                 <td class="dir-list-menu" onclick="show_rclick_menu('<%- r.location %>')"><i class="fas fa-ellipsis-h"></i></td>
                 <td class="dir-list-remove cursor-pointer" onclick="remove('<%- r.location %>')"><i class="fas fa-trash"></i></td>
-              <% } %>
-              <td class="dir-list-size"> <%- r.size %> </td>
-              <td class="dir-list-ctime"><%- r.ctime %></td>
-              <td class="dir-list-mtime"><%- r.mtime %></td>
-              <td class="dir-list-download"><i class="fas fa-download" onclick='download("<%- r.location %>", <%- r.type === "dir" %>)'></i></td>
-          </tr>
+                <% } %>
+                <td class="dir-list-size"> <%- r.size %> </td>
+                <td class="dir-list-ctime"><%- r.ctime %></td>
+                <td class="dir-list-mtime"><%- r.mtime %></td>
+                <td class="dir-list-download"><i class="fas fa-download" onclick='download("<%- r.location %>", <%- r.type === "dir" %>)'></i></td>
+              </tr>
+          <% i += 1; %>
         <% }) %>
       </tbody></table>
 
@@ -184,6 +201,28 @@
     <label for="new-folder-hidden">Enabled</label>
     
     <button class="form-submit-btn-small" onclick="mkdir_submit_form()">更新</button>
+  </div>
+</div>
+
+<div class="popup" id="move-file-form" style="visibility:hidden;">
+  <script>
+    const close_move_file_form = ()=>{
+      document.getElementById('move-file-form').style.visibility = 'hidden';
+      document.getElementById('click-detector').style.display = 'none';
+      document.getElementById('file-list-rclick-menu').style.display = 'none';
+    }
+  </script>
+  <div class="popup-inner my-form">
+    <button class="popup-close-btn" onclick="close_move_file_form()">
+      <i class="fas fa-times"></i></button>
+    <h1><span id="move-file-form-loc"></span>〜を移動します。</h1>
+    <label></label>
+    <label for="move-file-form-to">移動先</label><br>
+    <input type="text" id="move-file-form-to" list="dirs" class="input-text-with-btn" placeholder="/hogehoge"><br>
+    <datalist id="move-file-form-dl">
+      <option value="/">/</option>
+    </datalist>
+    <button class="form-submit-btn-oneline" id="move-file-form-btn">移動</button>
   </div>
 </div>
 
@@ -282,6 +321,11 @@
     el2.style.width = `${percent}%`;
   }
 
+const _copy = (from, to) => {
+
+}
+
+
   const show_rclick_menu = (location) => {
     console.log("AAAAAAAAAAAAAAAAAAAa")
 
@@ -317,12 +361,63 @@
           body: JSON.stringify({from : location, to:input.value})
         })
         // document.location.reload()
+      if(res.ok){
+          document.getElementById('move-file-form').style.visibility = 'hidden';
+          document.getElementById('click-detector').style.display = 'none';
+          document.getElementById('file-list-rclick-menu').style.display = 'none';
+          document.location.reload();
+        }else{
+          const errmsg = await res.json();
+          MyMessage({msg: errmsg.err });
+        }
       }
       form.style.visibility = "visible";
     };
 
     document.getElementById("file-list-rclick-menu-move").addEventListener("click", () => {
+      const form = document.getElementById("move-file-form");
+      document.getElementById("move-file-form-loc").innerText = location;
+      const btn = document.getElementById("move-file-form-btn")
+      const datalist = document.getElementById("move-file-form-dl")
+      const input = document.getElementById("move-file-form-to")
+      
+      input.oninput = async(e) => {
+        const res = await fetch("/api/list", {
+          method:"POST",
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({location : input.value.replace(/(.+)\/(.^\/)+^/gm, "$1")})
+        })
+        if(res.status === 500){return false;}
+        const data = (await res.json()).child;
+        let dl_text = "<option class='move-file-form-op' value='/'>/</option>"
+        for(d in data){
+          dl_text += `<option class='move-file-form-op' value='${data[d].location}'>${data[d].location}</option>`
+        }
+        datalist.innerHTML = dl_text;
+        const options = Array.from(document.getElementsByClassName("move-file-form-op"));
+        options.forEach(el => {el.onclick = () => {input.value = el.value;}});
+        console.log(input.value, dl_text)
+      }
 
+      btn.onclick = async(e) => {
+        const res = await fetch("/api/move", {
+          method:"POST",
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({from : location, to:input.value})
+        })
+        // document.location.reload()
+
+        if(res.ok){
+          document.getElementById('move-file-form').style.visibility = 'hidden';
+          document.getElementById('click-detector').style.display = 'none';
+          document.getElementById('file-list-rclick-menu').style.display = 'none';
+          document.location.reload();
+        }else{
+          const errmsg = await res.json();
+          MyMessage({msg: errmsg.err });
+        }
+      }
+      form.style.visibility = "visible";
     });
 
     document.getElementById("file-list-rclick-menu-delete").addEventListener("click", () => {remove(location)});
@@ -344,6 +439,58 @@
     }
     return false;
   }
+
+const get_file_list_num = () => {
+  var id = 0;
+  while(true){
+    const chbox = document.getElementById("file-select-chbox" + id.toString());
+    if(!chbox) return id;
+    id += 1;
+  }
+}
+
+const getSelectedFiles = () =>{
+  var arr = [];
+  const n = get_file_list_num();
+  for(var i= 0; i<n; i++){
+    const chbox = document.getElementById("file-select-chbox" + i.toString());
+    if(chbox.checked){ arr.push(chbox.name); }
+  }
+  return arr;
+}
+
+const check_all_file_selection = (checked) => {
+  const n = get_file_list_num();
+  for(var id =0; id<n; id++){
+    const chbox = document.getElementById("file-select-chbox" + id.toString());
+    chbox.checked = checked;
+    console.log(chbox.name);
+  }
+  update_file_selection_menu();
+  const ch_all = document.getElementById("file-select-chbox-all");
+  ch_all.checked = checked;
+}
+
+const _b_check_all_file_selection = () => {
+  const selected_all = getSelectedFiles().length == get_file_list_num();
+  check_all_file_selection(!selected_all);
+}
+
+const update_file_selection_menu = () => {
+  const wrap = document.getElementsByClassName("list-selection")[0];
+  const selected_files = getSelectedFiles();
+  if(selected_files.length == 0) {
+    wrap.style.display = "none";
+    return;
+  }
+  wrap.style.display= "inline-block";
+  document.getElementById("selected-files-num-span").innerText = selected_files.length.toString();
+}
+
+const select_copy = () => {
+  const f = getSelectedFiles();
+}
+
 
   const body_clicked = (e) => {
     // document.getElementById('file-list-rclick-menu').style.display="none";
@@ -394,14 +541,16 @@
   }
 
   const remove = async(location) => {
-    const response =  await fetch("/api/remove", {
+    const isTrash = document.location.href.includes("trash");
+    const uri = isTrash ? "/api/remove-trash" : "/api/remove";
+    const response =  await fetch(uri, {
       method:"POST",
       headers: {'Content-Type': 'application/json'},
       body:JSON.stringify({location:location})
     })
     if(response.ok){
       console.log("OK")
-      document.location.reload()
+      document.location.reload();
     }else{
       console.error("error", await response.text())
       MyMessage({msg:"アップロード失敗"})
@@ -505,6 +654,10 @@
     main_content.addEventListener("dragover",(event) => {
       event.preventDefault();
     });
+
+    check_all_file_selection();
+    files_seleced_list = [];
+    update_file_selection_menu();
   }
 </script>
 

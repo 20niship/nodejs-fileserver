@@ -206,12 +206,23 @@ router.post("/copy", async(req, res) =>{
 })
 
 router.post("/move", async(req, res) =>{
+  const name = path.basename(req.body.from);
   if(!("from" in req.body && "to" in req.body)){
     res.status(500).send("No location parameter");
     return;
   }
+
+  const from = path.format({base:process.env.DIR + req.body.from});
+  const to = path.format({base:process.env.DIR + req.body.to + "/" + name});
+  console.log(from);
+  console.log(to);
+  if(from === to){
+    res.status(500).json({err : "same dir"});
+    return;
+  }
+
   try{
-    await fs_extra.move(process.env.DIR + req.body.from, process.env.DIR + req.body.to, { overwrite: true })
+    await fs_extra.move(from,to,  { overwrite: true })
     res.send("OK")
   }catch(err) {
     res.status(500).send(err); ERROR(err);
@@ -295,6 +306,17 @@ router.post("/remove", async(req, res) =>{
   }
 })
 
+
+router.post("/remove-trash", async(req, res) =>{
+  if(!"location" in req.body){ res.status(500).send("No location parameter"); return; }
+  try{
+    const file = path.join(process.env.TRASH_DIR, req.body.location);
+    await fs_extra.remove(file);
+    res.send("OK")
+  }catch(err) {
+    res.status(500).send(err); ERROR(err);
+  }
+})
 
 router.post("/remove-all-trash", async(req, res) => {
   console.log(process.env.TRASH_DIR)

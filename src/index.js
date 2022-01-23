@@ -193,6 +193,10 @@ const ftype2icon = (ftype) => {
   return f2i[ftype] || "fas fa-file"
 }
 
+const filesize_format = (size) => {
+  var i = Math.floor( Math.log(size) / Math.log(1024) );
+  return ( size / Math.pow(1024, i) ).toFixed(2) + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+}
 
 const view = async(req, res, is_trash) => {
   const location = decodeURIComponent(req.query["dir"]|| "/").replace(/[\/]{2,}/gm, "/").replace(/(.^\/+)[\/]{1,}$/gm, "(.+)")
@@ -247,7 +251,7 @@ const view = async(req, res, is_trash) => {
       result.push({
         name : names[i],
         location : `${location}/${names[i]}`,
-        size : stat2.size,
+        size : filesize_format(stat2.size),
         icon : ftype2icon(filetype),
         ctime : formatDate(stat2.ctime),
         mtime : formatDate(stat2.mtime),
