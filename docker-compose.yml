@@ -1,4 +1,4 @@
-version: '3'                                                                                                                                                                                                                                
+version: '3'
 services:
   fileserver:
     image: 'node:16-alpine'
@@ -8,22 +8,6 @@ services:
     restart: always
     command: npm start
     environment:
-      PORT: "8080"
-      ExpireTime: "500000"
-      DIR: /storage/data
-      TRASH_DIR: /storage/trash
-      BACKUP_DIR: /storage/backup
-      UPLAD_TEMP_DIR: /storage/tmp
-
-      needLogin: "false"
-      needLoginToEdit: "false"
-      user_name: username
-      user_password: password
-
-      BACKUP: "true"
-      BACKUP_TIME: "0 1 * * *"
-
-      UPLOAD_FILE_MAX_SIZE: "10"
       UPLOAD_MAX_CHUNK_SIZE: "5000"
     ports:
       - "8080:8080"

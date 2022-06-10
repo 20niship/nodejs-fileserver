@@ -4,23 +4,31 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "nodemon  --exec ts-node index.ts"
   },
-  "author": "",
+  "author": "20niship",
   "license": "ISC",
   "dependencies": {
-    "connect-busboy": "0.0.2",
-    "dotenv": "^10.0.0",
-    "ejs": "^3.1.6",
-    "express": "^4.17.1",
-    "express-session": "^1.17.2",
-    "fs-extra": "^10.0.0",
+    "connect-busboy": "1.0.0",
+    "dotenv": "^16.0.1",
+    "ejs": "^3.1.8",
+    "express": "^4.18.1",
+    "express-session": "^1.17.3",
+    "fs-extra": "^10.1.0",
     "huge-uploader-nodejs": "^1.2.1",
-    "multer": "^1.4.3",
-    "multiparty": "^4.2.2",
-    "node-schedule": "^2.0.0",
-    "nodemon": "^2.0.13",
+    "multer": "^2.0.0-rc.3",
+    "multiparty": "^4.2.3",
+    "node-schedule": "^2.1.0",
+    "nodemon": "^2.0.16",
     "zip-dir": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/express-session": "^1.17.4",
+    "@types/fs-extra": "^9.0.13",
+    "@types/node": "^17.0.41",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.3"
   }
 }
